@@ -33,10 +33,10 @@ void setup()
 void loop()
 {
     p.clearFields();
-    p.addField("temp", sensor.readTemperature(), 1);
-    p.addField("humi", sensor.readHumidity(), 1);
+    p.addField("temp", sensor.readTemperature(), 2);
+    p.addField("humi", sensor.readHumidity(), 2);
     flux.writePoint(p);
 
     Serial.println(p.toLineProtocol());
-    delay(30000);
+    delay(60000);
 }
