@@ -38,5 +38,5 @@ void loop()
     flux.writePoint(p);
 
     Serial.println(p.toLineProtocol());
-    delay(60000);
+    delay(LOOP_DELAY);
 }
