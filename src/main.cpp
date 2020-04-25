@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <Ticker.h>
 
 #include "Adafruit_SHT31.h"
 #include "InfluxDbClient.h"
@@ -9,6 +10,9 @@
 Adafruit_SHT31 sensor;
 InfluxDBClient flux{INFLUX_SERVER, INFLUX_DB};
 Point p{"temps"};
+
+Ticker measureTicker;
+bool doMeasure = true;
 
 void setup()
 {
@@ -28,15 +32,20 @@ void setup()
     Serial.println(WiFi.localIP());
 
     p.addTag("ort", "test");
+
+    measureTicker.attach_ms(LOOP_DELAY, [] { doMeasure = true; });
 }
 
 void loop()
 {
-    p.clearFields();
-    p.addField("temp", sensor.readTemperature(), 2);
-    p.addField("humi", sensor.readHumidity(), 2);
-    flux.writePoint(p);
+    if (doMeasure)
+    {
+        p.clearFields();
+        p.addField("temp", sensor.readTemperature(), 2);
+        p.addField("humi", sensor.readHumidity(), 2);
+        flux.writePoint(p);
 
-    Serial.println(p.toLineProtocol());
-    delay(LOOP_DELAY);
+        Serial.println(p.toLineProtocol());
+        doMeasure = false;
+    }
 }
